@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">OthMLo</string>
+    <string name="board_size">Board Size</string>
 </resources>
