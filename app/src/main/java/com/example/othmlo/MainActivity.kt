@@ -48,9 +48,9 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(context)
             .setTitle("Enter Board Size")
             .setView(textInputLayout)
-            .setMessage("Enter an integer 1-10")
+            .setMessage("Enter an integer 3-10")
             .setPositiveButton("OK") { dialog, _ ->
-                if (input.text.toString().toInt() in 1..10) {
+                if (input.text.toString().toInt() in 3..10) {
                     boardSize = input.text.toString()
                     centerText?.text = boardSize
                     dialog.cancel()
