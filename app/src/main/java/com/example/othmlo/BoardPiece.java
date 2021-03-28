@@ -1,5 +1,5 @@
 package com.example.othmlo;
 
 public enum BoardPiece {
-    BLACK, WHITE, EMPTY
+    BLACK, WHITE, EMPTY, TIE
 }
