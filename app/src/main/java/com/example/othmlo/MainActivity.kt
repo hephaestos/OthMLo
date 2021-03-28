@@ -9,9 +9,7 @@ import android.text.InputType
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
@@ -19,11 +17,20 @@ import com.google.android.material.textfield.TextInputLayout
 class MainActivity : AppCompatActivity() {
     var boardSize: String? = null
     var centerText: TextView? = null
+    var chipButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        centerText = findViewById(R.id.hello)
+        chipButton = findViewById(R.id.place_chip)
+        chipButton?.setOnClickListener { _ ->
+            val gridPiece = findViewById<ImageView>(R.id.imageView4)
+            gridPiece.setImageResource(R.drawable.black_piece)
+        }
+        val img_3 = findViewById<ImageView>(R.id.imageView3)
+        img_3.setOnClickListener { _ ->
+            img_3.setImageResource(R.drawable.white_piece)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -52,10 +59,9 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("OK") { dialog, _ ->
                 if (input.text.toString().toInt() in 3..10) {
                     boardSize = input.text.toString()
-                    centerText?.text = boardSize
                     dialog.cancel()
                 } else {
-                    //input.text.clear()
+                    // TODO: Logic to keep dialog box open on bad input?
                 }
             }
             .setNegativeButton("Cancel") {dialog, _ ->
