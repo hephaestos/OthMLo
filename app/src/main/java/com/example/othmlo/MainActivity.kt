@@ -9,7 +9,11 @@ import android.text.InputType
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.FILL_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.*
+import android.widget.TableRow.LayoutParams
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
@@ -31,6 +35,23 @@ class MainActivity : AppCompatActivity() {
         img_3.setOnClickListener { _ ->
             img_3.setImageResource(R.drawable.white_piece)
         }
+
+        // TODO: Expand on this to dynamically add elements to tableLayout. Currently adds in elements but need layout params and listeners
+//        var tbLayout = findViewById<TableLayout>(R.id.tableLayout)
+//        var tr = TableRow(this)
+//        var img0 = ImageView(this)
+//        img0.setImageResource(R.drawable.black_piece)
+//        var img1 = ImageView(this)
+//        img1.setImageResource(R.drawable.black_piece)
+//        var img2 = ImageView(this)
+//        img2.setImageResource(R.drawable.black_piece)
+//        var img3 = ImageView(this)
+//        img3.setImageResource(R.drawable.black_piece)
+//        tr.addView(img0)
+//        tr.addView(img1)
+//        tr.addView(img2)
+//        tr.addView(img3)
+//        tbLayout.addView(tr)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
