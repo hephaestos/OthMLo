@@ -7,52 +7,28 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ViewGroup
+import android.view.*
 import android.view.ViewGroup.LayoutParams.FILL_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.*
 import android.widget.TableRow.LayoutParams
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
 class MainActivity : AppCompatActivity() {
     var boardSize: String? = null
-    var centerText: TextView? = null
     var chipButton: Button? = null
+    var subText: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        chipButton = findViewById(R.id.place_chip)
-        chipButton?.setOnClickListener { _ ->
-            val gridPiece = findViewById<ImageView>(R.id.imageView4)
-            gridPiece.setImageResource(R.drawable.black_piece)
-        }
-        val img_3 = findViewById<ImageView>(R.id.imageView3)
-        img_3.setOnClickListener { _ ->
-            img_3.setImageResource(R.drawable.white_piece)
-        }
-
-        // TODO: Expand on this to dynamically add elements to tableLayout. Currently adds in elements but need layout params and listeners
-//        var tbLayout = findViewById<TableLayout>(R.id.tableLayout)
-//        var tr = TableRow(this)
-//        var img0 = ImageView(this)
-//        img0.setImageResource(R.drawable.black_piece)
-//        var img1 = ImageView(this)
-//        img1.setImageResource(R.drawable.black_piece)
-//        var img2 = ImageView(this)
-//        img2.setImageResource(R.drawable.black_piece)
-//        var img3 = ImageView(this)
-//        img3.setImageResource(R.drawable.black_piece)
-//        tr.addView(img0)
-//        tr.addView(img1)
-//        tr.addView(img2)
-//        tr.addView(img3)
-//        tbLayout.addView(tr)
+        subText = findViewById(R.id.welcomeSubtext)
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -76,10 +52,30 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(context)
             .setTitle("Enter Board Size")
             .setView(textInputLayout)
-            .setMessage("Enter an integer 3-10")
+            .setMessage("Enter an even integer 4-10")
             .setPositiveButton("OK") { dialog, _ ->
-                if (input.text.toString().toInt() in 3..10) {
+                if (input.text.toString().toInt() in 4..10 step 2) {
                     boardSize = input.text.toString()
+                    subText?.text = ""
+                    // Dynamically creates board on screen based on user input
+                    // TODO: Add listeners to each of the views added
+                    val tbLayout = findViewById<TableLayout>(R.id.tableLayout)
+                    val board = boardSize?.toInt()
+                    for (i in 0 until board!!) {
+                        val tr = TableRow(this)
+                        var count = 0
+                        for (j in 0 until board) {
+                            if (i == ((board / 2) -1) && j == (board / 2) - 1 || (i == board / 2) && j == board / 2)
+                                tr.addView(createNewImage(R.drawable.black_piece))
+                            else if (((i == board / 2) && j == (board / 2) - 1 || i == (board / 2) - 1 && j == board / 2))
+                                tr.addView(createNewImage(R.drawable.white_piece))
+                            else
+                                tr.addView(createNewImage(R.drawable.grid_blank))
+                            count++
+                        }
+                        tr.gravity = Gravity.CENTER
+                        tbLayout.addView(tr)
+                    }
                     dialog.cancel()
                 } else {
                     // TODO: Logic to keep dialog box open on bad input?
@@ -89,5 +85,12 @@ class MainActivity : AppCompatActivity() {
                 dialog.cancel()
             }.create()
         builder.show()
+    }
+
+    private fun createNewImage(@DrawableRes resID: Int): ImageView {
+        val newImg = ImageView(this)
+        newImg.id = ViewCompat.generateViewId()
+        newImg.setImageResource(resID)
+        return newImg
     }
 }

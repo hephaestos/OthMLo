@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">OthMLo</string>
     <string name="board_size">Board Size</string>
+    <string name="blank_grid">Blank Grid</string>
+    <string name="place_chip">Place Chip</string>
+    <string name="welcome_subtext">Please enter a board size before beginning</string>
+    <string name="welcome_to_othmlo">Welcome to OthMLo!</string>
+    <string name="white_chip">White chip</string>
+    <string name="black_chip">Black Chip</string>
 </resources>
