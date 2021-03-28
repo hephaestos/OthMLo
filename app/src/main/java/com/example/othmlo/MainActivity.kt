@@ -17,6 +17,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
+import androidx.core.view.get
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
@@ -24,7 +25,8 @@ class MainActivity : AppCompatActivity() {
     var boardSize: String? = null
     var chipButton: Button? = null
     var subText: TextView? = null
-    var currDisc: String = "W"
+    var currDisc: BoardPiece = BoardPiece.WHITE
+    var tbLayout: TableLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,23 +64,23 @@ class MainActivity : AppCompatActivity() {
                     subText?.text = ""
                     // Dynamically creates board on screen based on user input
                     // TODO: Add listeners to each of the views added
-                    val tbLayout = findViewById<TableLayout>(R.id.tableLayout)
-                    tbLayout.removeAllViewsInLayout()
+                    tbLayout = findViewById<TableLayout>(R.id.tableLayout)
+                    tbLayout?.removeAllViewsInLayout()
                     val board = boardSize?.toInt()
                     for (i in 0 until board!!) {
                         val tr = TableRow(this)
                         var count = 0
                         for (j in 0 until board) {
                             if (i == ((board / 2) -1) && j == (board / 2) - 1 || (i == board / 2) && j == board / 2)
-                                tr.addView(createNewImage(R.drawable.black_piece, i.toString() + j.toString(), "B"))
+                                tr.addView(createNewImage(R.drawable.black_piece, i.toString() + j.toString(), "BLACK"))
                             else if (((i == board / 2) && j == (board / 2) - 1 || i == (board / 2) - 1 && j == board / 2))
-                                tr.addView(createNewImage(R.drawable.white_piece, i.toString() + j.toString(), "W"))
+                                tr.addView(createNewImage(R.drawable.white_piece, i.toString() + j.toString(), "WHITE"))
                             else
-                                tr.addView(createNewImage(R.drawable.grid_blank, i.toString() + j.toString(), "E"))
+                                tr.addView(createNewImage(R.drawable.grid_blank, i.toString() + j.toString(), "EMPTY"))
                             count++
                         }
                         tr.gravity = Gravity.CENTER
-                        tbLayout.addView(tr)
+                        tbLayout?.addView(tr)
                     }
                     dialog.cancel()
                 } else {
@@ -96,25 +98,66 @@ class MainActivity : AppCompatActivity() {
         newImg.id = imgID.toInt()
         newImg.setImageResource(resID)
         newImg.tag = tag
+        newImg.setOnClickListener(createImgListener(newImg))
         return newImg
     }
 
-//    private fun createImgListener(view: ImageView): View.OnClickListener {
-//        var clickListener = View.OnClickListener{
+    private fun createImgListener(view: ImageView): View.OnClickListener {
+        var clickListener = View.OnClickListener{
+            Log.d("HELLLOOOOOOOOOOOOOO", checkNorth(view.id).toString())
+        }
+        return clickListener
+    }
+
+//    private fun placeDisc(row: Int, col: Int) {
+//        if (!isValidMove(row, col))
+//            return
 //
-//        }
+//        if (checkWest(row, col, currDisc))
+//    }
+//
+//    private fun isValidMove(row: Int, col: Int) {
+//
 //    }
 
-    private fun placeDisc(row: Int, col: Int) {
-        if (!isValidMove(row, col))
-            return
+    // TODO: This is where you left off
+    private fun checkNorth(@IdRes img: Int): Boolean {
+        var numDisc = 0
+        var numNotDisc = 0
+        var numEmpty = 0
+        val row = firstDigit(img)
+        val col = img % 10
+        val board = boardSize?.toInt()
 
-        if (checkWest(row, col, currDisc))
+        for (i in (row - 1) downTo 0) {
+            val currImg = tbLayout?.findViewById<ImageView>((i.toString() + col.toString()).toInt())
+            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            if (i == board)
+                break
+            if (currTag == currDisc) {
+                numDisc++
+                if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
+                    return false
+                if (numNotDisc > 0 && numDisc > 0 )
+                    return true
+            }
+            if (currTag != currDisc && currTag != BoardPiece.EMPTY)
+                numNotDisc++
+            if (currTag == BoardPiece.EMPTY)
+                numEmpty++
+        }
+        return false
     }
 
-    private fun isValidMove(row: Int, col: Int) {
+    /**
+     * Function courtesy of @Sean
+     * https://stackoverflow.com/questions/2967898/retrieving-the-first-digit-of-a-number/2968068
+     */
+    private fun firstDigit(a: Int): Int {
+        var num = a
+        while (num > 9)
+            num /= 10
 
+        return num
     }
-
-    private fun checkNorth
 }
