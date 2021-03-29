@@ -7,4 +7,5 @@
     <string name="welcome_to_othmlo">Welcome to OthMLo!</string>
     <string name="white_chip">White chip</string>
     <string name="black_chip">Black Chip</string>
+    <string name="winner_text"> is the winner!</string>
 </resources>

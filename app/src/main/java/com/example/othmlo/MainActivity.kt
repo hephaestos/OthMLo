@@ -1,37 +1,32 @@
 package com.example.othmlo
 
-import android.app.ActionBar
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
-import android.content.res.Resources
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import android.view.*
-import android.view.ViewGroup.LayoutParams.FILL_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.*
-import android.widget.TableRow.LayoutParams
 import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.get
-import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputLayout
 
 class MainActivity : AppCompatActivity() {
-    var boardSize: String? = null
-    var chipButton: Button? = null
-    var subText: TextView? = null
-    var currDisc: BoardPiece = BoardPiece.WHITE
-    var tbLayout: TableLayout? = null
+    private var boardSize: String? = null
+    private var currTurn: TextView? = null
+    private var subText: TextView? = null
+    private var currDisc: BoardPiece = BoardPiece.WHITE
+    private var tbLayout: TableLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         subText = findViewById(R.id.welcomeSubtext)
+        currTurn = findViewById(R.id.currTurn)
     }
 
 
@@ -64,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                     subText?.text = ""
                     // Dynamically creates board on screen based on user input
                     // TODO: Add listeners to each of the views added
-                    tbLayout = findViewById<TableLayout>(R.id.tableLayout)
+                    tbLayout = findViewById(R.id.tableLayout)
                     tbLayout?.removeAllViewsInLayout()
                     val board = boardSize?.toInt()
                     for (i in 0 until board!!) {
@@ -103,18 +98,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createImgListener(view: ImageView): View.OnClickListener {
-        var clickListener = View.OnClickListener{
+        return View.OnClickListener{
             val currId = view.id.toString()
             placeDisc(currId)
         }
-        return clickListener
     }
 
     // TODO: Need to implement
+    @SuppressLint("SetTextI18n")
     private fun placeDisc(imgID: String) {
         val board = boardSize?.toInt()
-        var row = 0
-        var col = 0
+        val row: Int
+        val col: Int
         val imgBlack = R.drawable.black_piece
         val imgWhite = R.drawable.white_piece
         if (imgID.length < 2) {
@@ -307,11 +302,21 @@ class MainActivity : AppCompatActivity() {
 
             currImg?.tag = currDisc.toString()
 
-            if (!isGameOver())
+            if (!isGameOver()) {
+                val disc = currDisc
+                if (currDisc == BoardPiece.WHITE)
+                    currDisc = BoardPiece.BLACK
+                else
+                    currDisc = BoardPiece.WHITE
+                if (!isValidMoveAvailableForDisc()) {
+                    prepareNextTurn()
+                    return
+                }
+                currDisc = disc
                 prepareNextTurn()
+            } else
+                subText?.text = checkWinner().toString() + " is the winner!"
         }
-        if (!isGameOver())
-            return
     }
 
     // TODO: Need to test
@@ -396,20 +401,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (numBlack > numWhite)
-            return BoardPiece.BLACK
+        return if (numBlack > numWhite)
+            BoardPiece.BLACK
         else if (numWhite > numBlack)
-            return BoardPiece.WHITE
+            BoardPiece.WHITE
         else
-            return BoardPiece.TIE
+            BoardPiece.TIE
     }
 
     // TODO: Need to test
+    @SuppressLint("SetTextI18n")
     private fun prepareNextTurn() {
         currDisc = if (currDisc == BoardPiece.WHITE)
             BoardPiece.BLACK
         else
             BoardPiece.WHITE
+
+        currTurn?.text = "Current Player: $currDisc"
     }
 
 
@@ -419,9 +427,9 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
@@ -453,9 +461,9 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
@@ -488,10 +496,10 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        var currImg: ImageView? = null
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        var currImg: ImageView?
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
@@ -503,10 +511,10 @@ class MainActivity : AppCompatActivity() {
         for (i in (col + 1) until board!!) {
             if (i == board)
                 break
-            if (row == 0) {
-                 currImg = tbLayout?.findViewById(i.toString().toInt())
+            currImg = if (row == 0) {
+                tbLayout?.findViewById(i.toString().toInt())
             } else {
-                currImg = tbLayout?.findViewById((row.toString() + i.toString()).toInt())
+                tbLayout?.findViewById((row.toString() + i.toString()).toInt())
             }
             val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
@@ -528,9 +536,9 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
@@ -562,9 +570,9 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
@@ -599,9 +607,9 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
@@ -636,9 +644,9 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
@@ -673,16 +681,15 @@ class MainActivity : AppCompatActivity() {
         var numDisc = 0
         var numNotDisc = 0
         var numEmpty = 0
-        var row = 0
-        var col = 0
-        if (imgID.length < 2) {
+        val row: Int
+        val col: Int
+        if (imgID.first() == '0' || imgID.length < 2) {
             row = 0
             col = imgID.toInt()
         } else {
             row = firstDigit(imgID.toInt())
             col = imgID.toInt() % 10
         }
-        val board = boardSize?.toInt()
         var j = col - 1
 
         for (i in (row - 1) downTo 0) {
