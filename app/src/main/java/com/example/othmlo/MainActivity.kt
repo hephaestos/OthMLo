@@ -104,19 +104,215 @@ class MainActivity : AppCompatActivity() {
 
     private fun createImgListener(view: ImageView): View.OnClickListener {
         var clickListener = View.OnClickListener{
-            // Debugging statement
-            Log.d("HELLLOOOOOOOOOOOOOO", checkWinner().toString())
+            val currId = view.id.toString()
+            placeDisc(currId)
         }
         return clickListener
     }
 
     // TODO: Need to implement
-//    private fun placeDisc(row: Int, col: Int) {
-//        if (!isValidMove(row, col))
-//            return
-//
-//        if (checkWest(row, col, currDisc))
-//    }
+    private fun placeDisc(imgID: String) {
+        val board = boardSize?.toInt()
+        var row = 0
+        var col = 0
+        val imgBlack = R.drawable.black_piece
+        val imgWhite = R.drawable.white_piece
+        if (imgID.length < 2) {
+            row = 0
+            col = imgID.toInt()
+        } else {
+            row = firstDigit(imgID.toInt())
+            col = imgID.toInt() % 10
+        }
+        if (!isValidMove(imgID))
+            return
+
+        if (tbLayout?.findViewById<ImageView>((row.toString() + col.toString()).toInt())?.tag ==
+                BoardPiece.EMPTY.toString()) {
+            if (checkWest(imgID)) {
+                var colPos = col - 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (colPos >= 0) {
+                    currImg = tbLayout?.findViewById((row.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && colPos >= 0) {
+
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    colPos--
+                    currImg = tbLayout?.findViewById((row.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            if (checkEast(imgID)) {
+                var colPos = col + 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (colPos < boardSize?.toInt()!!) {
+                    currImg = tbLayout?.findViewById((row.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && colPos < board!!) {
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    colPos++
+                    currImg = tbLayout?.findViewById((row.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            if (checkSouth(imgID)) {
+                var rowPos = row + 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (rowPos < boardSize?.toInt()!!) {
+                    currImg = tbLayout?.findViewById((rowPos.toString() + col.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && rowPos >= 0) {
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    rowPos++
+                    currImg = tbLayout?.findViewById((rowPos.toString() + col.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            if (checkNorth(imgID)) {
+                var rowPos = row - 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (rowPos >= 0) {
+                    currImg = tbLayout?.findViewById((rowPos.toString() + col.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && rowPos < board!!) {
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    rowPos--
+                    currImg = tbLayout?.findViewById((rowPos.toString() + col.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            if (checkNortheast(imgID)) {
+                var rowPos = row - 1
+                var colPos = col + 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (colPos < boardSize?.toInt()!! && rowPos >= 0) {
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && rowPos >= 0 && colPos < board!!) {
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    rowPos--
+                    colPos++
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            if (checkSouthwest(imgID)) {
+                var rowPos = row + 1
+                var colPos = col - 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (colPos >= 0 && rowPos < boardSize?.toInt()!!) {
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && rowPos < board!! && colPos >= 0) {
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    rowPos++
+                    colPos--
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            if (checkSoutheast(imgID)) {
+                var rowPos = row + 1
+                var colPos = col + 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (colPos < boardSize?.toInt()!! && rowPos < boardSize?.toInt()!!) {
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && rowPos < board!! && colPos < board) {
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    rowPos++
+                    colPos++
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            if (checkNorthwest(imgID)) {
+                var rowPos = row - 1
+                var colPos = col - 1
+                var currImg: ImageView? = null
+                var currTag: BoardPiece? = null
+                if (colPos >= 0 && rowPos >= 0) {
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+                while (currTag != currDisc && currTag != BoardPiece.EMPTY && rowPos < board!! && colPos >= 0) {
+                    currImg?.tag = currDisc.toString()
+                    if (currDisc == BoardPiece.BLACK)
+                        currImg?.setImageResource(imgBlack)
+                    else
+                        currImg?.setImageResource(imgWhite)
+                    rowPos--
+                    colPos--
+                    currImg = tbLayout?.findViewById((rowPos.toString() + colPos.toString()).toInt())
+                    currTag = BoardPiece.valueOf(currImg?.tag.toString())
+                }
+            }
+
+            val currImg = tbLayout?.findViewById<ImageView>((row.toString() + col.toString()).toInt())
+
+            if (currDisc == BoardPiece.BLACK && BoardPiece.valueOf(currImg?.tag.toString()) == BoardPiece.EMPTY)
+                currImg?.setImageResource(imgBlack)
+            else if (currDisc == BoardPiece.WHITE && BoardPiece.valueOf(currImg?.tag.toString()) == BoardPiece.EMPTY)
+                currImg?.setImageResource(imgWhite)
+
+            currImg?.tag = currDisc.toString()
+
+            if (!isGameOver())
+                prepareNextTurn()
+        }
+        if (!isGameOver())
+            return
+    }
 
     // TODO: Need to test
     private fun isValidMove(imgID: String): Boolean {
@@ -133,17 +329,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // TODO: Need to test
-    private fun isValidMoveAvailable(): Boolean {
-        return isValidMoveAvailableForDisc()
-    }
-
-    // TODO: Need to test
     private fun isValidMoveAvailableForDisc(): Boolean {
         val board = boardSize?.toInt()
         for (row in 0 until board!!) {
             for (col in 0 until board) {
                 val currImg = tbLayout?.findViewById<ImageView>((row.toString() + col.toString()).toInt())
-                val currTag = BoardPiece.valueOf(currImg?.tag as String)
+                val currTag = BoardPiece.valueOf(currImg?.tag.toString())
                 if (currTag == BoardPiece.EMPTY)
                     if (isValidMoveForDisc(row.toString() + col.toString()))
                         return true
@@ -158,7 +349,7 @@ class MainActivity : AppCompatActivity() {
         for (row in 0 until board!!) {
             for (col in 0 until board) {
                 val currImg = tbLayout?.findViewById<ImageView>((row.toString() + col.toString()).toInt())
-                val currTag = BoardPiece.valueOf(currImg?.tag as String)
+                val currTag = BoardPiece.valueOf(currImg?.tag.toString())
                 if (currTag == BoardPiece.EMPTY)
                     return false
             }
@@ -197,7 +388,7 @@ class MainActivity : AppCompatActivity() {
         for (row in 0 until board!!) {
             for (col in 0 until board) {
                 val currImg = tbLayout?.findViewById<ImageView>((row.toString() + col.toString()).toInt())
-                val currTag = BoardPiece.valueOf(currImg?.tag as String)
+                val currTag = BoardPiece.valueOf(currImg?.tag.toString())
                 if (currTag == BoardPiece.BLACK)
                     numBlack++
                 if (currTag == BoardPiece.WHITE)
@@ -242,7 +433,7 @@ class MainActivity : AppCompatActivity() {
             if (i < 0)
                 break
             val currImg = tbLayout?.findViewById<ImageView>((i.toString() + col.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
@@ -277,7 +468,7 @@ class MainActivity : AppCompatActivity() {
             if (i == board)
                 break
             val currImg = tbLayout?.findViewById<ImageView>((i.toString() + col.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
@@ -299,6 +490,7 @@ class MainActivity : AppCompatActivity() {
         var numEmpty = 0
         var row = 0
         var col = 0
+        var currImg: ImageView? = null
         if (imgID.length < 2) {
             row = 0
             col = imgID.toInt()
@@ -311,8 +503,12 @@ class MainActivity : AppCompatActivity() {
         for (i in (col + 1) until board!!) {
             if (i == board)
                 break
-            val currImg = tbLayout?.findViewById<ImageView>((row.toString() + i.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            if (row == 0) {
+                 currImg = tbLayout?.findViewById(i.toString().toInt())
+            } else {
+                currImg = tbLayout?.findViewById((row.toString() + i.toString()).toInt())
+            }
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
@@ -346,7 +542,7 @@ class MainActivity : AppCompatActivity() {
             if (i < 0)
                 break
             val currImg = tbLayout?.findViewById<ImageView>((row.toString() + i.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
@@ -382,7 +578,7 @@ class MainActivity : AppCompatActivity() {
             if (i < 0 || j == board)
                 break
             val currImg = tbLayout?.findViewById<ImageView>((i.toString() + j.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
@@ -419,7 +615,7 @@ class MainActivity : AppCompatActivity() {
             if (i == board || j < 0)
                 break
             val currImg = tbLayout?.findViewById<ImageView>((i.toString() + j.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
@@ -456,7 +652,7 @@ class MainActivity : AppCompatActivity() {
             if (i == board || j == board)
                 break
             val currImg = tbLayout?.findViewById<ImageView>((i.toString() + j.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
@@ -493,7 +689,7 @@ class MainActivity : AppCompatActivity() {
             if (i < 0 || j < 0)
                 break
             val currImg = tbLayout?.findViewById<ImageView>((i.toString() + j.toString()).toInt())
-            val currTag = BoardPiece.valueOf(currImg?.tag as String)
+            val currTag = BoardPiece.valueOf(currImg?.tag.toString())
             if (currTag == currDisc) {
                 numDisc++
                 if (numDisc > 0 && numNotDisc == 0 || numEmpty > 0)
