@@ -13,7 +13,13 @@ import android.widget.*
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.textfield.TextInputLayout
+
+// const val AD_UNIT_ID = "ca-app-pub-8621865123944893/4945704105" // This is the real AD_UNIT_ID
+const val AD_UNIT_ID = "ca-app-pub-3940256099942544/8691691433"
 
 class MainActivity : AppCompatActivity() {
     private var boardSize: String? = null
@@ -21,17 +27,25 @@ class MainActivity : AppCompatActivity() {
     private var subText: TextView? = null
     private var currDisc: BoardPiece = BoardPiece.WHITE
     private var tbLayout: TableLayout? = null
+    private var completedGameCount: Int = 0
+    private var othInterstitialAd: InterstitialAd? = null
+    private var TAG = "MainActivity"
+    private var boardMenu: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         subText = findViewById(R.id.welcomeSubtext)
         currTurn = findViewById(R.id.currTurn)
+
+        MobileAds.initialize(this) {}
+        loadAd()
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        boardMenu = menu?.findItem(R.id.menu_board_size)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -41,6 +55,46 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return false
+    }
+
+    private fun loadAd() {
+        var adRequest = AdRequest.Builder().build()
+
+        InterstitialAd.load(
+            this, AD_UNIT_ID, adRequest, object: InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    othInterstitialAd = null
+                    Log.d(TAG, adError.message)
+                }
+
+                override fun onAdLoaded(intAd: InterstitialAd) {
+                    othInterstitialAd = intAd
+                    Log.d(TAG, "Ad was loaded")
+                }
+            }
+        )
+    }
+
+    private fun showInterstitialAd() {
+        if (othInterstitialAd != null) {
+            othInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    Log.d(TAG, "Ad was dismissed")
+                    othInterstitialAd = null
+                    loadAd()
+                }
+
+                override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                    Log.d(TAG, error.message)
+                    othInterstitialAd = null
+                }
+
+                override fun onAdShowedFullScreenContent() {
+                    Log.d(TAG, "Ad was shown")
+                }
+            }
+            othInterstitialAd?.show(this)
+        }
     }
 
     private fun createBoardDialog(context: Context) {
@@ -58,26 +112,24 @@ class MainActivity : AppCompatActivity() {
                     boardSize = input.text.toString()
                     subText?.text = ""
                     // Dynamically creates board on screen based on user input
-                    // TODO: Add listeners to each of the views added
                     tbLayout = findViewById(R.id.tableLayout)
                     tbLayout?.removeAllViewsInLayout()
                     val board = boardSize?.toInt()
                     for (i in 0 until board!!) {
                         val tr = TableRow(this)
-                        var count = 0
-                        for (j in 0 until board) {
+                        for (j in (0 until board)) {
                             if (i == ((board / 2) -1) && j == (board / 2) - 1 || (i == board / 2) && j == board / 2)
                                 tr.addView(createNewImage(R.drawable.black_piece, i.toString() + j.toString(), "BLACK"))
                             else if (((i == board / 2) && j == (board / 2) - 1 || i == (board / 2) - 1 && j == board / 2))
                                 tr.addView(createNewImage(R.drawable.white_piece, i.toString() + j.toString(), "WHITE"))
                             else
                                 tr.addView(createNewImage(R.drawable.grid_blank, i.toString() + j.toString(), "EMPTY"))
-                            count++
                         }
                         tr.gravity = Gravity.CENTER
                         tbLayout?.addView(tr)
                     }
                     dialog.cancel()
+                    boardMenu?.title = "Board Size"
                 } else {
                     // TODO: Logic to keep dialog box open on bad input?
                 }
@@ -104,7 +156,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // TODO: Need to implement
     @SuppressLint("SetTextI18n")
     private fun placeDisc(imgID: String) {
         val board = boardSize?.toInt()
@@ -314,8 +365,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 currDisc = disc
                 prepareNextTurn()
-            } else
-                subText?.text = checkWinner().toString() + " is the winner!"
+            } else {
+                if (++completedGameCount % 2 == 0)
+                    showInterstitialAd()
+                if (checkWinner().toString() == "TIE")
+                    subText?.text = "It's a TIE!"
+                else
+                    subText?.text = checkWinner().toString() + " is the winner!"
+                boardMenu?.title = "Start New Game"
+            }
         }
     }
 
