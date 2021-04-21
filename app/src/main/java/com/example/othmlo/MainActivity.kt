@@ -18,7 +18,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.textfield.TextInputLayout
 
-// const val AD_UNIT_ID = "ca-app-pub-8621865123944893/4945704105" // This is the real AD_UNIT_ID
+//const val AD_UNIT_ID = "ca-app-pub-8621865123944893/4945704105" // This is the real AD_UNIT_ID
 const val AD_UNIT_ID = "ca-app-pub-3940256099942544/8691691433"
 
 /**
