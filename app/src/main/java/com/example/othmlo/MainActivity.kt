@@ -146,13 +146,13 @@ class MainActivity : AppCompatActivity() {
                         for (j in (0 until board)) {
                             // Two of middle pieces should be black to start game
                             if (i == ((board / 2) -1) && j == (board / 2) - 1 || (i == board / 2) && j == board / 2)
-                                tr.addView(createNewImage(R.drawable.black_piece, i.toString() + j.toString(), "BLACK"))
+                                tr.addView(createNewImage(R.drawable.black_game_piece, i.toString() + j.toString(), "BLACK"))
                             // Two of middle pieces should also be white to start game
                             else if (((i == board / 2) && j == (board / 2) - 1 || i == (board / 2) - 1 && j == board / 2))
-                                tr.addView(createNewImage(R.drawable.white_piece, i.toString() + j.toString(), "WHITE"))
+                                tr.addView(createNewImage(R.drawable.white_game_piece, i.toString() + j.toString(), "WHITE"))
                             // Everything else is empty board pieces/images to start
                             else
-                                tr.addView(createNewImage(R.drawable.grid_blank, i.toString() + j.toString(), "EMPTY"))
+                                tr.addView(createNewImage(R.drawable.blank_grid_tile, i.toString() + j.toString(), "EMPTY"))
                         }
                         tr.gravity = Gravity.CENTER // Center all items in their tablerows
                         tbLayout?.addView(tr) // Add new row to table layout
@@ -205,8 +205,8 @@ class MainActivity : AppCompatActivity() {
         val board = boardSize?.toInt()
         val row: Int
         val col: Int
-        val imgBlack = R.drawable.black_piece
-        val imgWhite = R.drawable.white_piece
+        val imgBlack = R.drawable.black_game_piece
+        val imgWhite = R.drawable.white_game_piece
         // If the ID this function receives is only single digit, we know the row is 0
         // This is necessary due to converting strings beginning with 0 into integers
         if (imgID.length < 2) {
