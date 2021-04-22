@@ -13,6 +13,9 @@ import android.widget.*
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.textfield.TextInputLayout
 
 class MainActivity : AppCompatActivity() {
@@ -22,11 +25,19 @@ class MainActivity : AppCompatActivity() {
     private var currDisc: BoardPiece = BoardPiece.WHITE
     private var tbLayout: TableLayout? = null
 
+    lateinit var adView: AdView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        MobileAds.initialize(this)
         subText = findViewById(R.id.welcomeSubtext)
         currTurn = findViewById(R.id.currTurn)
+        adView = findViewById(R.id.theAd)
+
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
 
 
@@ -54,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             .setView(textInputLayout)
             .setMessage("Enter an even integer 4-10")
             .setPositiveButton("OK") { dialog, _ ->
-                if (input.text.toString().toInt() in 4..10 step 2) {
+                if (input.text.toString().toInt() in 4..100 step 2) {
                     boardSize = input.text.toString()
                     subText?.text = ""
                     // Dynamically creates board on screen based on user input
@@ -67,11 +78,11 @@ class MainActivity : AppCompatActivity() {
                         var count = 0
                         for (j in 0 until board) {
                             if (i == ((board / 2) -1) && j == (board / 2) - 1 || (i == board / 2) && j == board / 2)
-                                tr.addView(createNewImage(R.drawable.black_piece, i.toString() + j.toString(), "BLACK"))
+                                tr.addView(createNewImage(R.drawable.black_game_piece, i.toString() + j.toString(), "BLACK"))
                             else if (((i == board / 2) && j == (board / 2) - 1 || i == (board / 2) - 1 && j == board / 2))
-                                tr.addView(createNewImage(R.drawable.white_piece, i.toString() + j.toString(), "WHITE"))
+                                tr.addView(createNewImage(R.drawable.white_game_piece, i.toString() + j.toString(), "WHITE"))
                             else
-                                tr.addView(createNewImage(R.drawable.grid_blank, i.toString() + j.toString(), "EMPTY"))
+                                tr.addView(createNewImage(R.drawable.blank_grid_tile, i.toString() + j.toString(), "EMPTY"))
                             count++
                         }
                         tr.gravity = Gravity.CENTER
@@ -110,8 +121,8 @@ class MainActivity : AppCompatActivity() {
         val board = boardSize?.toInt()
         val row: Int
         val col: Int
-        val imgBlack = R.drawable.black_piece
-        val imgWhite = R.drawable.white_piece
+        val imgBlack = R.drawable.black_game_piece
+        val imgWhite = R.drawable.white_game_piece
         if (imgID.length < 2) {
             row = 0
             col = imgID.toInt()
